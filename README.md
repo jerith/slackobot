@@ -1,0 +1,2 @@
+# slackobot
+An ocaml slackbot
