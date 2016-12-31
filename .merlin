@@ -1,0 +1,11 @@
+S src/**
+B _build/src/**
+
+PKG cmdliner
+PKG lwt
+PKG lwt.ppx
+PKG cohttp.lwt
+PKG yojson
+PKG slacko
+PKG ppx_deriving.show
+PKG ppx_deriving_yojson
