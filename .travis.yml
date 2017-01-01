@@ -10,9 +10,10 @@ env:
     # https://github.com/mirage/ocaml-conduit/issues/189
     - PINS="conduit.0.14.0"  # TODO: Remove this once conduit has a fixed release.
   matrix:
-    # - OCAML_VERSION="4.02"
+    - OCAML_VERSION="4.02"
     - OCAML_VERSION="4.03"
-    # - OCAML_VERSION="4.04"
+    - OCAML_VERSION="4.04"
 os:
   - linux
-  - osx
+  # OSX builds are slower and we don't really need them for now.
+  # - osx
