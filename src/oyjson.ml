@@ -24,7 +24,8 @@ module ObjMap = struct
     val singleton : string -> value -> t
     val remove : string -> t -> t
     val merge : (string -> value option -> value option -> value option) -> t -> t -> t
-    val union : (string -> value -> value -> value option) -> t -> t -> t
+    (* This was introduced on 4.03, so we don't get it in earlier versions. *)
+    (* val union : (string -> value -> value -> value option) -> t -> t -> t *)
     val compare : (value -> value -> int) -> t -> t -> int
     val equal : (value -> value -> bool) -> t -> t -> bool
     val iter : (string -> value -> unit) -> t -> unit
