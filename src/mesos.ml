@@ -77,8 +77,8 @@ let format_cluster_capacity ?gpus ?width cluster ff cc =
 
 let get_cluster_capacity ?gpus ?width ?cluster base_uri =
   Mesos_api.get_state_summary base_uri >|= function
-  | Error str -> "Error getting cluster capacity: " ^ str
-  | Ok ss ->
+  | Result.Error str -> "Error getting cluster capacity: " ^ str
+  | Result.Ok ss ->
     let cluster =
       match cluster, Mesos_api.State_summary.cluster ss with
       | None, None -> "<anonymous>"

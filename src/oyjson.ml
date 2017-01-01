@@ -87,7 +87,7 @@ module ObjMap = struct
         let open Ppx_deriving_yojson_runtime in
         map_bind pair_of_yojson [] alist >|=
         List.fold_left (fun a (k, v) -> add k v a) empty
-      | _ -> Error "Unexpected value"
+      | _ -> Result.Error "Unexpected value"
 
   end
 end
