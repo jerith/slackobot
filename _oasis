@@ -12,34 +12,15 @@ BuildTools: ocamlbuild
 Plugins: META (0.4), DevFiles (0.4)
 
 
-Library "oyjson"
-  Path: src/oyjson
-  Modules: Oyjson
-  BuildDepends:
-    ppx_deriving.std, ppx_deriving_yojson
-
-Library "cohttp_helpers"
-  Path: src/cohttp_helpers
-  Modules: Http
-  BuildDepends:
-    cohttp.lwt, lwt, yojson
-
-Library "mesos"
-  Path: src/mesos
-  Modules: Mesos_api, Mesos_tools
-  BuildDepends:
-    cohttp.lwt, lwt, ppx_deriving.std, ppx_deriving_yojson,
-    cohttp_helpers, oyjson
-
 Library "slackobot"
   Path: src
   Modules: Mesos
   BuildDepends:
-    slacko,
-    mesos
+    cmdliner, cohttp.lwt, lwt, ppx_deriving.std, ppx_deriving_yojson, slacko,
+    yojson
 
 Executable "slackobot"
   Path: src
   MainIs: slackobot.ml
   BuildDepends:
-    cmdliner, slacko, slackobot
+    cmdliner, slackobot

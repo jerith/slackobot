@@ -1,0 +1,19 @@
+opam-version: "1.2"
+name: "slackobot"
+version: "0.1.0~dev"
+maintainer: "Jeremy Thurgood <firxen@gmail.com>"
+authors: "Jeremy Thurgood <firxen@gmail.com>"
+homepage: "https://github.com/jerith/slackobot"
+bug-reports: "https://github.com/jerith/slackobot/issues"
+dev-repo: "https://github.com/jerith/slackobot"
+license: "Expat"
+build: [
+  ["./configure" "--prefix=%{prefix}%"]
+  [make]
+]
+install: [make "install"]
+remove: ["ocamlfind" "remove" "slackobot"]
+depends: [
+  "ocamlfind" {build}
+]
+available: [ocaml-version >= "4.02"]
