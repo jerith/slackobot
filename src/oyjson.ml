@@ -60,16 +60,16 @@ module ObjMap = struct
     let map_to f a =
       StringMap.map f a
 
-    let pp_pair fmt sep (k, v) =
-      if sep then Format.fprintf fmt ";";
-      Format.fprintf fmt "@ \"%s\": " k;
-      Obj.pp fmt v;
+    let pp_pair ff sep (k, v) =
+      if sep then Format.fprintf ff ";";
+      Format.fprintf ff "@ \"%s\": " k;
+      Obj.pp ff v;
       true
 
-    let pp fmt a =
-      Format.fprintf fmt "@[<2>{";
-      ignore @@ List.fold_left (pp_pair fmt) false (bindings a);
-      Format.fprintf fmt "@,}@]"
+    let pp ff a =
+      Format.fprintf ff "@[<2>{";
+      ignore @@ List.fold_left (pp_pair ff) false (bindings a);
+      Format.fprintf ff "@,}@]"
 
     let show a =
       pp Format.str_formatter a;

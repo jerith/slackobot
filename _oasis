@@ -14,7 +14,7 @@ Plugins: META (0.4), DevFiles (0.4)
 
 Library "slackobot"
   Path: src
-  Modules: Mesos
+  Modules: Mesos, Message
   BuildDepends:
     cmdliner, cohttp.lwt, lwt, ppx_deriving.std, ppx_deriving_yojson, slacko,
     yojson
@@ -22,5 +22,20 @@ Library "slackobot"
 Executable "slackobot"
   Path: src
   MainIs: slackobot.ml
+  CompiledObject: best
   BuildDepends:
     cmdliner, slackobot
+
+Executable "test_slackobot"
+  Path: src-test
+  MainIs: test_slackobot.ml
+  Build$: flag(tests)
+  Install: false
+  CompiledObject: best
+  BuildDepends:
+    str, oUnit, qcheck, slackobot
+
+Test "test_slackobot"
+  Run$: flag(tests)
+  Command: $test_slackobot
+  WorkingDirectory: src-test

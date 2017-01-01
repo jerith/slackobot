@@ -8,14 +8,17 @@ bug-reports: "https://github.com/jerith/slackobot/issues"
 dev-repo: "https://github.com/jerith/slackobot"
 license: "Expat"
 build: [
-  ["./configure" "--prefix=%{prefix}%"]
+  ["./configure" "--prefix=%{prefix}%" "--%{ounit:enable}%-tests"]
   [make]
 ]
+build-test: [make "test"]
 install: [make "install"]
 remove: ["ocamlfind" "remove" "slackobot"]
 depends: [
   "ocamlfind" {build}
   "oasis" {build}
+  "ounit" {test}
+  "qcheck" {test}
   "cmdliner"
   "tls" | "ssl"
   "lwt"
