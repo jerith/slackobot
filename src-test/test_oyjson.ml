@@ -29,7 +29,7 @@ module Test_ObjMap = struct
   let mkyj pairs = `Assoc (List.map (fun (k, v) -> k, `Int v) pairs)
 
   let prop_of_yojson pairs =
-    (mkyj pairs |> IntObjMap.of_yojson) = (Ok (mkiom pairs))
+    (mkyj pairs |> IntObjMap.of_yojson) = (Result.Ok (mkiom pairs))
 
   let prop_to_yojson pairs =
     (mkiom pairs |> IntObjMap.to_yojson |> Yojson.Safe.sort) =
