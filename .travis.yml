@@ -6,7 +6,6 @@ env:
   global:
     - PACKAGE="slackobot"
     - EXTRA_DEPS="oasis"
-    - TESTS=false  # TODO: Add some tests.
     # https://github.com/mirage/ocaml-conduit/issues/189
     - PINS="conduit.0.14.0"  # TODO: Remove this once conduit has a fixed release.
   matrix:
