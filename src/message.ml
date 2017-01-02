@@ -2,6 +2,10 @@
 * Message plugin.
 *)
 
+let string_of_chat_obj {Slacko.ts; chat; text} =
+  Printf.sprintf "{ts: %.f, chat: %%s, text: %s}"
+    ts (* chat *) (match text with None -> "" | Some t -> t)
+
 let string_of_response = function
   | `Account_inactive -> "Error: Account inactive."
   | `Channel_not_found -> "Error: Channel not found."
@@ -10,16 +14,18 @@ let string_of_response = function
   | `Msg_too_long -> "Error: Message too long."
   | `Not_authed -> "Error: Not authed."
   | `Rate_limited -> "Error: Rate limited."
-  | `Success json -> Yojson.Basic.pretty_to_string json
+  | `Success chatobj -> string_of_chat_obj chatobj
   | `Unhandled_error str -> "Unhandled error: " ^ str
   | `Unknown_error -> "Unknown error."
+  | `User_is_bot -> "Error: User is bot."
+  | `ParseFailure str -> "Parse failure: " ^ str
 
 let print_response resp = string_of_response resp |> print_endline
 
-
 let post_message slackopts message =
   let open Lwt in
-  Common.post_message slackopts message >|= print_response
+  Common.make_message message |> Common.post_message slackopts >|=
+  print_response
   |> Lwt_main.run
 
 

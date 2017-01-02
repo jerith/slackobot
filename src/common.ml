@@ -12,13 +12,21 @@ type slackopts = {
 
 let slackopts token channel username = {token; channel; username}
 
-let post_message slackopts message =
+type message = {
+  text: string;
+  attachments: Slacko.attachment_obj list option;
+}
+
+let make_message ?attachments text = { text; attachments }
+
+let post_message slackopts { text; attachments } =
   let token = Slacko.token_of_string slackopts.token in
   let channel = Slacko.Channel (Slacko.channel_of_string slackopts.channel) in
-  let message = Slacko.message_of_string message in
+  let message = Slacko.message_of_string text in
   Slacko.chat_post_message token channel
     ?username:(slackopts.username)
     ~icon_emoji:":camel:"
+    ?attachments
     message
 
 
