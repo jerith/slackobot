@@ -6,6 +6,7 @@ env:
   global:
     - PACKAGE="slackobot"
     - EXTRA_DEPS="oasis"
+    - PINS="slacko:https://github.com/jerith/slacko.git#post-attachment"
   matrix:
     - OCAML_VERSION="4.02"
     - OCAML_VERSION="4.03"
