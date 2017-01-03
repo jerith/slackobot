@@ -84,7 +84,7 @@ let format_cluster_capacity_fields ?gpus cc =
   let mkfield (res, cap) =
     let title = asprintf "[role: %s]" res in
     let value = asprintf "%a" (format_cap ?gpus) cap in
-    Slacko.field ~title ~value ~short:true ()
+    Slacko.field ~title ~short:true value
   in
   let bindings = Capacities.bindings cc in
   let fallback = bindings |> List.map mkfallback |> String.concat "\n" in
