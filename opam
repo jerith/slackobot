@@ -20,6 +20,7 @@ depends: [
   "ounit" {test}
   "qcheck" {test}
   "cmdliner"
+  "fmt"
   "tls" | "ssl"
   "lwt"
   "cohttp"

@@ -13,3 +13,4 @@ PKG ppx_deriving.show
 PKG ppx_deriving_yojson
 PKG ounit
 PKG qcheck
+PKG fmt

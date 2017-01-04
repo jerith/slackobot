@@ -16,8 +16,8 @@ Library "slackobot"
   Path: src
   Modules: Mesos, Message
   BuildDepends:
-    cmdliner, cohttp.lwt, lwt, ppx_deriving.std, ppx_deriving_yojson, slacko,
-    yojson
+    cmdliner, cohttp.lwt, fmt, lwt, ppx_deriving.std, ppx_deriving_yojson,
+    slacko, yojson
 
 Executable "slackobot"
   Path: src

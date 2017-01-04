@@ -2,34 +2,15 @@
 * Mesos plugin for slackobot.
 *)
 
-open Format
 open Lwt
 
 
-let rec truncdecimal s =
-  let l = String.length s - 1 in
-  match s.[l] with
-  | '.' -> String.sub s 0 l
-  | '0' -> String.sub s 0 l |> truncdecimal
-  | _ -> s
+let pp_float_gb pr ppf n = Fmt.pf ppf "%aG" (Fmt.float_dfrac pr) (n /. 1000.)
 
-let format_float_nice precision ff a =
-  let s = sprintf "%.*f" precision a in
-  fprintf ff "%s" (truncdecimal s)
-
-let format_n pr ff n = fprintf ff "%a" (format_float_nice pr) n
-let format_gb pr ff n = fprintf ff "%aG" (format_float_nice pr) (n /. 1000.)
-
-let format_field fmt ff (used, unused, total) =
-  fprintf ff "%a / %a" fmt unused fmt total
+let pp_availcap fmt ppf (used, unused, total) =
+  Fmt.pf ppf "%a / %a" fmt unused fmt total
 
 let cap_field getter cap =
-  let open Mesos_tools in
-  (Capacity.used cap |> getter,
-   Capacity.unused cap |> getter,
-   Capacity.total cap |> getter)
-
-let cap_opt getter cap =
   let open Mesos_tools in
   match
     Capacity.used cap |> getter,
@@ -39,37 +20,41 @@ let cap_opt getter cap =
   | Some used, Some unused, Some total -> Some (used, unused, total)
   | _ -> None
 
-let pp_field value fmt ff name =
-  fprintf ff "*%s*: %a" name (format_field fmt) value
+let pp_field name fmt value =
+  let pp_field' v ppf () = Fmt.pf ppf "*%s*: %a" name (pp_availcap fmt) v in
+  Mesos_utils.optmap pp_field' value
 
-let pp_null fmt ff name = ()
-
-let pp_sep ff () = pp_print_break ff 0 (-2)
-
-let format_cap ?gpus:(gpus=false) ff cap =
-  let open Mesos_api in
-  let pp_req getter = pp_field (cap_field getter cap) in
-  let pp_opt getter =
-    match cap_opt getter cap with
-    | None -> pp_null
-    | Some value -> pp_field value
+let filter_opt l =
+  let rec f' l = function
+    | [] -> List.rev l
+    | None :: tl -> f' l tl
+    | Some v :: tl -> f' (v :: l) tl
   in
-  let filter_gpus = List.filter (fun (n, _) -> n <> "gpus" || gpus) in
-  pp_open_vbox ff 0;
-  filter_gpus [
-    "disk", pp_req Resources.disk (format_gb 1);
-    "mem", pp_req Resources.mem (format_gb 3);
-    "gpus", pp_opt Resources.gpus (format_n 2);
-    "cpus", pp_req Resources.cpus (format_n 2);
-  ] |> pp_print_list (fun ff (n, pp) -> pp ff n) ~pp_sep:pp_print_cut ff;
-  pp_close_box ff ()
+  f' [] l
+
+let format_cap ?gpus:(gpus=false) ppf cap =
+  let open Mesos_api in
+  let get_disk cap = Some (Resources.disk cap) in
+  let get_mem cap = Some (Resources.mem cap) in
+  let get_gpus cap = if gpus then Resources.gpus cap else None in
+  let get_cpus cap = Some (Resources.cpus cap) in
+  let pp_cap = Fmt.vbox @@ Fmt.list (fun ppf v -> v ppf ()) in
+  Fmt.pf ppf "%a" pp_cap @@ filter_opt [
+    pp_field "disk" (pp_float_gb 1) (cap_field get_disk cap);
+    pp_field "mem" (pp_float_gb 3) (cap_field get_mem cap);
+    pp_field "gpus" (Fmt.float_dfrac 2) (cap_field get_gpus cap);
+    pp_field "cpus" (Fmt.float_dfrac 2) (cap_field get_cpus cap);
+  ]
 
 let format_cluster_capacity_attachments ?gpus cc =
   let open Mesos_tools in
   let mkattach (res, cap) =
-    let pretext = asprintf "role: `%s`" res in
-    let fallback = asprintf "%s: %a" res (format_cap ?gpus) cap in
-    let text = asprintf "%a" (format_cap ?gpus) cap in
+    let pretext = match res with
+      | "*" -> "unreserved"
+      | _ -> Fmt.strf "reserved: `%s`" res
+    in
+    let fallback = Fmt.strf "%s: %a" res (format_cap ?gpus) cap in
+    let text = Fmt.strf "%a" (format_cap ?gpus) cap in
     let mrkdwn_in = ["pretext"; "fields"; "text"] in
     Slacko.attachment ~fallback ~pretext ~text ~mrkdwn_in ()
   in
@@ -78,12 +63,13 @@ let format_cluster_capacity_attachments ?gpus cc =
 
 let format_cluster_capacity_fields ?gpus cc =
   let open Mesos_tools in
-  let mkfallback (res, cap) =
-    asprintf "%s\n%a" res (format_cap ?gpus) cap
-  in
+  let mkfallback (res, cap) = Fmt.strf "%s\n%a" res (format_cap ?gpus) cap in
   let mkfield (res, cap) =
-    let title = asprintf "[role: %s]" res in
-    let value = asprintf "%a" (format_cap ?gpus) cap in
+    let title = match res with
+      | "*" -> "[unreserved]"
+      | _ -> Fmt.strf "[reserved: %s]" res
+    in
+    let value = Fmt.strf "%a" (format_cap ?gpus) cap in
     Slacko.field ~title ~short:true value
   in
   let bindings = Capacities.bindings cc in
@@ -94,7 +80,7 @@ let format_cluster_capacity_fields ?gpus cc =
 
 
 let build_msg format_cluster_capacity ?gpus ?width cluster cc =
-  let text = sprintf ":dcos: _*%s*_ cluster capacity:" cluster in
+  let text = Fmt.strf ":dcos: _*%s*_ cluster capacity:" cluster in
   let attachments = format_cluster_capacity ?gpus cc in
   Common.make_message ~attachments text
 
