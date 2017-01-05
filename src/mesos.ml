@@ -106,6 +106,7 @@ let string_of_response = function
   | `Invalid_auth -> "Error: Invalid auth."
   | `Is_archived -> "Error: Archived."
   | `Msg_too_long -> "Error: Message too long."
+  | `Too_many_attachments -> "Error: Too many attachments."
   | `Not_authed -> "Error: Not authed."
   | `Rate_limited -> "Error: Rate limited."
   | `Success json -> "Success!"
