@@ -5,7 +5,7 @@
 open Lwt
 
 
-let pp_float_gb pr ppf n = Fmt.pf ppf "%aG" (Fmt.float_dfrac pr) (n /. 1000.)
+let pp_float_gb pr ppf n = Fmt.pf ppf "%aG" (Fmt.float_dfrac pr) (n /. 1024.)
 
 let pp_availcap fmt ppf (used, unused, total) =
   Fmt.pf ppf "%a / %a" fmt unused fmt total
